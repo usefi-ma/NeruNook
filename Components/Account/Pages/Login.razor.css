@@ -1,0 +1,144 @@
+.cms-login {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+    min-height: 100vh;
+    background: #101712;
+    color: #f5f2eb;
+}
+
+.cms-login-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
+    padding: clamp(2rem, 7vw, 7rem);
+}
+
+.cms-login-logo img {
+    width: 150px;
+    height: auto;
+}
+
+.cms-login-eyebrow,
+.cms-login-field label {
+    margin: 0 0 .7rem;
+    font-size: .7rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+
+.cms-login h1 {
+    margin: .5rem 0 1rem;
+    font-size: clamp(3rem, 6vw, 6rem);
+    font-weight: 300;
+    letter-spacing: -.055em;
+    line-height: .94;
+}
+
+.cms-login-copy {
+    max-width: 34rem;
+    margin: 0;
+    color: rgba(245, 242, 235, .68);
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
+.cms-login-form {
+    display: grid;
+    gap: 1.4rem;
+    max-width: 34rem;
+}
+
+.cms-login-field {
+    display: grid;
+}
+
+::deep .cms-login-field input {
+    width: 100%;
+    padding: .85rem 0 1rem;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .34);
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+}
+
+::deep .cms-login-field input:focus {
+    border-color: #fff;
+}
+
+::deep .cms-login-field input::placeholder {
+    color: rgba(255, 255, 255, .36);
+}
+
+.cms-login-remember {
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+    color: rgba(255, 255, 255, .72);
+    font-size: .9rem;
+}
+
+.cms-login-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(100%, 240px);
+    padding: 1rem 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: #f5f2eb;
+    color: #111812;
+    font: inherit;
+    cursor: pointer;
+}
+
+.cms-login-back {
+    width: fit-content;
+    color: rgba(255, 255, 255, .68);
+    text-decoration: none;
+}
+
+.cms-login-art {
+    position: relative;
+    min-height: 100%;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 45% 35%, rgba(92, 119, 91, .28), transparent 44%),
+        #172019;
+}
+
+.cms-login-art img {
+    position: absolute;
+    right: -9%;
+    bottom: -2%;
+    width: min(900px, 105%);
+    height: auto;
+}
+
+.cms-validation,
+::deep .validation-message {
+    color: #efc7bc;
+    font-size: .82rem;
+}
+
+@media (max-width: 820px) {
+    .cms-login {
+        grid-template-columns: 1fr;
+    }
+
+    .cms-login-panel {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        padding: 2rem 24px 4rem;
+        background: linear-gradient(90deg, rgba(16, 23, 18, .96), rgba(16, 23, 18, .78));
+    }
+
+    .cms-login-art {
+        position: fixed;
+        inset: 0;
+    }
+}

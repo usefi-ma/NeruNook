@@ -1,0 +1,62 @@
+@inherits LayoutComponentBase
+
+<div class="cms-layout-scope">
+<MudThemeProvider Theme="@cmsTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudLayout Class="cms-layout">
+    <MudAppBar Elevation="0" Class="cms-appbar">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDrawer" />
+        <a class="cms-wordmark" href="/admin">NERUNOOK <span>CMS</span></a>
+        <MudSpacer />
+        <a class="cms-view-site" href="/" target="_blank" rel="noopener noreferrer">View site ↗</a>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="drawerOpen" Variant="DrawerVariant.Responsive" Breakpoint="Breakpoint.Md" Elevation="0" Class="cms-drawer">
+        <MudDrawerHeader>
+            <div class="cms-drawer-brand">
+                <img src="/assets/logo-white.png" alt="NeruNook Digital Studio" />
+            </div>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/admin" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.SpaceDashboard">Dashboard</MudNavLink>
+            <MudNavLink Href="/admin/contact-inquiries" Icon="@Icons.Material.Outlined.MailOutline">Contact Inquiries</MudNavLink>
+            <MudNavLink Href="/admin/users" Icon="@Icons.Material.Outlined.ManageAccounts">Users</MudNavLink>
+        </MudNavMenu>
+
+        <form class="cms-logout" action="/Account/Logout" method="post">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="admin/login" />
+            <button type="submit"><MudIcon Icon="@Icons.Material.Outlined.Logout" Size="Size.Small" /> Logout</button>
+        </form>
+    </MudDrawer>
+
+    <MudMainContent Class="cms-main">
+        <div class="cms-content">
+            @Body
+        </div>
+    </MudMainContent>
+</MudLayout>
+</div>
+
+@code {
+    private bool drawerOpen = true;
+
+    private void ToggleDrawer() => drawerOpen = !drawerOpen;
+
+    private readonly MudTheme cmsTheme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#172019",
+            Secondary = "#60745f",
+            Background = "#f3f0e8",
+            Surface = "#f8f6f0",
+            AppbarBackground = "#f3f0e8",
+            AppbarText = "#172019",
+            DrawerBackground = "#121a14",
+            DrawerText = "#f5f2eb"
+        }
+    };
+}

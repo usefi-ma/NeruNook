@@ -1,0 +1,186 @@
+@page "/admin/users"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+@using System.ComponentModel.DataAnnotations
+
+@inject AdminUserService UserService
+@inject ISnackbar Snackbar
+
+<PageTitle>Users — NeruNook CMS</PageTitle>
+
+<div class="cms-users-page">
+<header class="cms-page-header">
+    <div>
+        <p>Access</p>
+        <h1>Users</h1>
+    </div>
+    <span>@users.Count account@(users.Count == 1 ? "" : "s")</span>
+</header>
+
+<div class="cms-users-layout">
+    <section>
+        <h2>CMS access</h2>
+        <div class="cms-users-list">
+            @foreach (var user in users)
+            {
+                <MudPaper Class="cms-user-card" Elevation="0">
+                    <div class="cms-user-main">
+                        <span class="cms-user-avatar">@Initials(user.Email)</span>
+                        <div>
+                            <strong>@user.Email</strong>
+                            <span>@(user.IsAdmin ? "Administrator" : "CMS user") · @(user.IsLocked ? "Disabled" : "Active")</span>
+                        </div>
+                    </div>
+                    <div class="cms-user-actions">
+                        <MudButton Size="Size.Small" Variant="Variant.Text" OnClick="@(() => ToggleAdminAsync(user))">
+                            @(user.IsAdmin ? "Remove Admin" : "Make Admin")
+                        </MudButton>
+                        <MudButton Size="Size.Small" Variant="Variant.Text" Color="@(user.IsLocked ? Color.Success : Color.Error)" OnClick="@(() => ToggleLockAsync(user))">
+                            @(user.IsLocked ? "Enable" : "Disable")
+                        </MudButton>
+                    </div>
+                </MudPaper>
+            }
+        </div>
+    </section>
+
+    <aside class="cms-user-forms">
+        <MudPaper Class="cms-form-panel" Elevation="0">
+            <p class="cms-kicker">New account</p>
+            <h2>Create user</h2>
+            <EditForm Model="createModel" OnValidSubmit="CreateUserAsync" FormName="create-cms-user">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <label class="cms-input-field">
+                    <span>Email</span>
+                    <input type="email" @bind="createModel.Email" @bind:event="oninput" autocomplete="email" />
+                    <ValidationMessage For="() => createModel.Email" />
+                </label>
+                <label class="cms-input-field">
+                    <span>Temporary password</span>
+                    <input type="password" @bind="createModel.Password" @bind:event="oninput" autocomplete="new-password" />
+                    <ValidationMessage For="() => createModel.Password" />
+                </label>
+                <label class="cms-checkbox-field">
+                    <input type="checkbox" @bind="createModel.IsAdmin" />
+                    <span>Assign Admin role</span>
+                </label>
+                <button type="submit" class="cms-form-button">Create user</button>
+            </EditForm>
+        </MudPaper>
+
+        <MudPaper Class="cms-form-panel" Elevation="0">
+            <p class="cms-kicker">Credentials</p>
+            <h2>Reset password</h2>
+            <EditForm Model="resetModel" OnValidSubmit="ResetPasswordAsync" FormName="reset-cms-password">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <label class="cms-input-field">
+                    <span>User</span>
+                    <select @bind="resetModel.UserId">
+                    @foreach (var user in users)
+                    {
+                        <option value="@user.Id">@user.Email</option>
+                    }
+                    </select>
+                </label>
+                <label class="cms-input-field">
+                    <span>New password</span>
+                    <input type="password" @bind="resetModel.Password" @bind:event="oninput" autocomplete="new-password" />
+                    <ValidationMessage For="() => resetModel.Password" />
+                </label>
+                <button type="submit" class="cms-form-button cms-form-button--outline">Reset password</button>
+            </EditForm>
+        </MudPaper>
+    </aside>
+</div>
+</div>
+
+@code {
+    private IReadOnlyList<AdminUserSummary> users = [];
+    private CreateUserModel createModel = new();
+    private ResetPasswordModel resetModel = new();
+
+    protected override async Task OnInitializedAsync() => await LoadUsersAsync();
+
+    private async Task LoadUsersAsync()
+    {
+        users = await UserService.GetUsersAsync();
+        if (string.IsNullOrWhiteSpace(resetModel.UserId) && users.Count > 0)
+        {
+            resetModel.UserId = users[0].Id;
+        }
+    }
+
+    private async Task CreateUserAsync()
+    {
+        var result = await UserService.CreateAsync(createModel.Email, createModel.Password, createModel.IsAdmin);
+        ShowResult(result);
+        if (result.Succeeded)
+        {
+            createModel = new();
+            await LoadUsersAsync();
+        }
+    }
+
+    private async Task ResetPasswordAsync()
+    {
+        var result = await UserService.ResetPasswordAsync(resetModel.UserId, resetModel.Password);
+        ShowResult(result);
+        if (result.Succeeded)
+        {
+            resetModel.Password = "";
+        }
+    }
+
+    private async Task ToggleLockAsync(AdminUserSummary user)
+    {
+        var result = await UserService.SetLockedAsync(user.Id, !user.IsLocked);
+        ShowResult(result);
+        if (result.Succeeded)
+        {
+            await LoadUsersAsync();
+        }
+    }
+
+    private async Task ToggleAdminAsync(AdminUserSummary user)
+    {
+        var result = await UserService.SetAdminAsync(user.Id, !user.IsAdmin);
+        ShowResult(result);
+        if (result.Succeeded)
+        {
+            await LoadUsersAsync();
+        }
+    }
+
+    private void ShowResult(UserOperationResult result) =>
+        Snackbar.Add(result.Message, result.Succeeded ? Severity.Success : Severity.Error);
+
+    private static string Initials(string email)
+    {
+        var local = email.Split('@')[0];
+        return local.Length == 0 ? "U" : local[..Math.Min(2, local.Length)].ToUpperInvariant();
+    }
+
+    private sealed class CreateUserModel
+    {
+        [Required, EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required, MinLength(10)]
+        public string Password { get; set; } = "";
+
+        public bool IsAdmin { get; set; }
+    }
+
+    private sealed class ResetPasswordModel
+    {
+        [Required]
+        public string UserId { get; set; } = "";
+
+        [Required, MinLength(10)]
+        public string Password { get; set; } = "";
+    }
+}

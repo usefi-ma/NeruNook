@@ -1,0 +1,156 @@
+@page "/admin/contact-inquiries/{Id:int}"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject ISnackbar Snackbar
+
+<PageTitle>Inquiry #@Id — NeruNook CMS</PageTitle>
+
+<div class="cms-inquiry-detail-page">
+@if (loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (inquiry is null)
+{
+    <div class="cms-not-found">
+        <p>Contact inbox</p>
+        <h1>Inquiry not found.</h1>
+        <a href="/admin/contact-inquiries">← Return to inquiries</a>
+    </div>
+}
+else
+{
+    <header class="cms-detail-header">
+        <div>
+            <a href="/admin/contact-inquiries">← Contact inquiries</a>
+            <p>Inquiry #@inquiry.Id</p>
+            <h1>@inquiry.Name</h1>
+        </div>
+        <span class="@($"cms-status cms-status--{inquiry.Status.ToString().ToLowerInvariant()}")">@StatusText(inquiry.Status)</span>
+    </header>
+
+    <div class="cms-detail-grid">
+        <MudPaper Class="cms-message" Elevation="0">
+            <p class="cms-kicker">Message</p>
+            <p>@inquiry.Message</p>
+        </MudPaper>
+
+        <aside class="cms-detail-sidebar">
+            <MudPaper Class="cms-contact-card" Elevation="0">
+                <DetailItem Label="Email" Value="@inquiry.Email" />
+                <DetailItem Label="Company" Value="@(string.IsNullOrWhiteSpace(inquiry.Company) ? "—" : inquiry.Company)" />
+                <DetailItem Label="Project type" Value="@ProjectTypeText(inquiry.ProjectType)" />
+                <DetailItem Label="Budget" Value="@BudgetText(inquiry.Budget)" />
+                <DetailItem Label="Received" Value="@inquiry.CreatedAtUtc.ToLocalTime().ToString("MMMM d, yyyy · h:mm tt")" />
+                <DetailItem Label="Read" Value="@(inquiry.IsRead ? "Yes" : "No")" />
+            </MudPaper>
+        </aside>
+    </div>
+
+    <section class="cms-actions" aria-label="Inquiry actions">
+        <a class="cms-reply-button" href="@MailToUrl">Reply by Email <span aria-hidden="true">↗</span></a>
+        @if (!inquiry.IsRead)
+        {
+            <MudButton Variant="Variant.Outlined" OnClick="MarkReadAsync">Mark as Read</MudButton>
+        }
+        <MudButton Variant="Variant.Outlined" OnClick="@(() => UpdateStatusAsync(ContactInquiryStatus.InProgress))">Mark In Progress</MudButton>
+        <MudButton Variant="Variant.Outlined" OnClick="@(() => UpdateStatusAsync(ContactInquiryStatus.Replied))">Mark Replied</MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Error" OnClick="@(() => UpdateStatusAsync(ContactInquiryStatus.Archived))">Archive</MudButton>
+    </section>
+}
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ContactInquiry? inquiry;
+    private bool loading = true;
+
+    private string MailToUrl => inquiry is null
+        ? "#"
+        : $"mailto:{Uri.EscapeDataString(inquiry.Email)}?subject={Uri.EscapeDataString("Re: Your NeruNook inquiry")}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        inquiry = await db.ContactInquiries.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id);
+        loading = false;
+    }
+
+    private async Task MarkReadAsync()
+    {
+        if (inquiry is null)
+        {
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var entity = await db.ContactInquiries.FindAsync(inquiry.Id);
+        if (entity is null)
+        {
+            return;
+        }
+
+        entity.IsRead = true;
+        await db.SaveChangesAsync();
+        inquiry.IsRead = true;
+        Snackbar.Add("Inquiry marked as read.", Severity.Success);
+    }
+
+    private async Task UpdateStatusAsync(ContactInquiryStatus status)
+    {
+        if (inquiry is null)
+        {
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var entity = await db.ContactInquiries.FindAsync(inquiry.Id);
+        if (entity is null)
+        {
+            return;
+        }
+
+        entity.Status = status;
+        if (status != ContactInquiryStatus.New)
+        {
+            entity.IsRead = true;
+        }
+
+        await db.SaveChangesAsync();
+        inquiry.Status = status;
+        inquiry.IsRead = entity.IsRead;
+        Snackbar.Add($"Inquiry marked {StatusText(status).ToLowerInvariant()}.", Severity.Success);
+    }
+
+    private static string StatusText(ContactInquiryStatus status) => status switch
+    {
+        ContactInquiryStatus.InProgress => "In progress",
+        _ => status.ToString()
+    };
+
+    private static string ProjectTypeText(string value) => value switch
+    {
+        "web-design" => "Web Design",
+        "e-commerce" => "E-Commerce",
+        "cms-digital-solution" => "CMS / Digital Solution",
+        "other" => "Other",
+        "" => "—",
+        _ => value
+    };
+
+    private static string BudgetText(string value) => value switch
+    {
+        "under-1000" => "Under $1,000",
+        "1000-3000" => "$1,000–$3,000",
+        "3000-5000" => "$3,000–$5,000",
+        "5000-plus" => "$5,000+",
+        "not-sure" => "Not sure yet",
+        "" => "—",
+        _ => value
+    };
+}

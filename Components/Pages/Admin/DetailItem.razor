@@ -1,0 +1,12 @@
+<div class="cms-detail-item">
+    <span>@Label</span>
+    <strong>@Value</strong>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; } = "";
+}

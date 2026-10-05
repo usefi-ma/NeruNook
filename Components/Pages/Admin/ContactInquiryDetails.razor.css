@@ -1,0 +1,120 @@
+.cms-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(23, 32, 25, .18);
+}
+
+.cms-detail-header a,
+.cms-not-found a {
+    color: rgba(23, 32, 25, .65);
+    font-size: .82rem;
+    text-decoration: none;
+}
+
+.cms-detail-header p,
+.cms-kicker,
+.cms-not-found > p {
+    margin: 2rem 0 .5rem;
+    color: rgba(23, 32, 25, .55);
+    font-size: .68rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.cms-detail-header h1,
+.cms-not-found h1 {
+    margin: 0;
+    font-size: clamp(2.7rem, 5vw, 5.2rem);
+    font-weight: 300;
+    letter-spacing: -.05em;
+}
+
+.cms-detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, .7fr);
+    gap: 1.25rem;
+}
+
+::deep .cms-message,
+::deep .cms-contact-card {
+    border: 1px solid rgba(23, 32, 25, .13);
+    border-radius: 0;
+    background: rgba(255, 255, 255, .34);
+}
+
+::deep .cms-message {
+    min-height: 370px;
+    padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cms-message > p:last-child {
+    max-width: 760px;
+    margin: 2rem 0 0;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    line-height: 1.75;
+    white-space: pre-wrap;
+}
+
+::deep .cms-contact-card {
+    padding: .8rem 1.5rem;
+}
+
+.cms-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.cms-reply-button {
+    display: inline-flex;
+    gap: 1.4rem;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 42px;
+    padding: .65rem 1.2rem;
+    border-radius: 999px;
+    background: #172019;
+    color: #fff;
+    text-decoration: none;
+}
+
+.cms-status {
+    display: inline-flex;
+    width: fit-content;
+    padding: .4rem .72rem;
+    border-radius: 999px;
+    background: rgba(23, 32, 25, .08);
+    font-size: .72rem;
+}
+
+.cms-status--new {
+    background: #dce8da;
+    color: #294b30;
+}
+
+.cms-status--inprogress {
+    background: #eee4cb;
+    color: #675321;
+}
+
+.cms-status--replied {
+    background: #dbe6ea;
+    color: #294c59;
+}
+
+@media (max-width: 760px) {
+    .cms-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .cms-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,43 @@
+:root {
+    color-scheme: light;
+}
+
+h1:focus {
+    outline: none;
+}
+
+.cms-auth-input {
+    width: 100%;
+    padding: .85rem 0 1rem;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .34);
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+}
+
+.cms-auth-input:focus {
+    border-color: #fff;
+}
+
+.cms-auth-input::placeholder {
+    color: rgba(255, 255, 255, .36);
+}
+
+.cms-auth-input:-webkit-autofill,
+.cms-auth-input:-webkit-autofill:hover,
+.cms-auth-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #101712 inset;
+    -webkit-text-fill-color: #fff;
+    caret-color: #fff;
+}
+
+#blazor-error-ui {
+    display: none;
+}
+
+#blazor-error-ui .reload {
+    color: inherit;
+}

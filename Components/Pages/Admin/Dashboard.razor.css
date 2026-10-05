@@ -1,0 +1,79 @@
+.cms-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(23, 32, 25, .18);
+}
+
+.cms-page-header p,
+.cms-dashboard-action p {
+    margin: 0 0 .6rem;
+    color: rgba(23, 32, 25, .57);
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.cms-page-header h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 5rem);
+    font-weight: 300;
+    letter-spacing: -.05em;
+}
+
+.cms-page-header > span {
+    color: rgba(23, 32, 25, .55);
+    font-size: .85rem;
+}
+
+::deep .cms-stat {
+    min-height: 180px;
+    padding: 1.5rem;
+    border: 1px solid rgba(23, 32, 25, .14);
+    border-radius: 0;
+    background: transparent;
+}
+
+::deep .cms-stat span {
+    color: rgba(23, 32, 25, .6);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+::deep .cms-stat strong {
+    display: block;
+    margin-top: 2rem;
+    font-size: 3.6rem;
+    font-weight: 300;
+}
+
+::deep .cms-dashboard-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border-radius: 0;
+    background: #172019;
+    color: #f5f2eb;
+}
+
+.cms-dashboard-action h2 {
+    max-width: 700px;
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 3.8rem);
+    font-weight: 300;
+    letter-spacing: -.04em;
+}
+
+@media (max-width: 680px) {
+    .cms-page-header,
+    ::deep .cms-dashboard-action {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

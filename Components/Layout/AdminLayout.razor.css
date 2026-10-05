@@ -1,0 +1,98 @@
+::deep .cms-layout {
+    min-height: 100vh;
+    background: #f3f0e8;
+    color: #172019;
+}
+
+::deep .cms-appbar {
+    border-bottom: 1px solid rgba(23, 32, 25, .13);
+    background: rgba(243, 240, 232, .94);
+    color: #172019;
+    backdrop-filter: blur(12px);
+}
+
+.cms-wordmark {
+    color: inherit;
+    font-size: .86rem;
+    font-weight: 650;
+    letter-spacing: .12em;
+    text-decoration: none;
+}
+
+.cms-wordmark span {
+    color: rgba(23, 32, 25, .48);
+    font-weight: 500;
+}
+
+.cms-view-site {
+    color: inherit;
+    font-size: .8rem;
+    text-decoration: none;
+}
+
+::deep .cms-drawer {
+    border-right: 1px solid rgba(255, 255, 255, .1);
+    background: #121a14;
+    color: #f5f2eb;
+}
+
+.cms-drawer-brand {
+    padding: 1.1rem .5rem;
+}
+
+.cms-drawer-brand img {
+    width: 145px;
+    height: auto;
+}
+
+::deep .cms-drawer .mud-nav-link {
+    margin: .25rem .75rem;
+    border-radius: 0;
+    color: rgba(255, 255, 255, .66);
+}
+
+::deep .cms-drawer .mud-nav-link.active {
+    border-left: 2px solid #f5f2eb;
+    background: rgba(255, 255, 255, .07);
+    color: #fff;
+}
+
+::deep .cms-main {
+    min-height: 100vh;
+}
+
+.cms-content {
+    width: min(100%, 1440px);
+    margin-inline: auto;
+    padding: clamp(5.5rem, 8vw, 7.5rem) clamp(1.25rem, 4vw, 4rem) 4rem;
+}
+
+.cms-logout {
+    position: absolute;
+    right: 1rem;
+    bottom: 1.25rem;
+    left: 1rem;
+}
+
+.cms-logout button {
+    display: flex;
+    gap: .7rem;
+    align-items: center;
+    width: 100%;
+    padding: .8rem 1rem;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, .66);
+    font: inherit;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .cms-content {
+        padding-inline: 20px;
+    }
+
+    .cms-view-site {
+        display: none;
+    }
+}

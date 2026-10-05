@@ -1,0 +1,71 @@
+@page "/admin"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Dashboard — NeruNook CMS</PageTitle>
+
+<div class="cms-dashboard-page">
+<header class="cms-page-header">
+    <div>
+        <p>NeruNook CMS</p>
+        <h1>Dashboard</h1>
+    </div>
+    <span>@DateTime.Now.ToString("MMMM dd, yyyy")</span>
+</header>
+
+<MudGrid Spacing="3">
+    <MudItem xs="12" sm="6" lg="3">
+        <MudPaper Class="cms-stat" Elevation="0">
+            <span>New inquiries</span>
+            <strong>@newCount</strong>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" lg="3">
+        <MudPaper Class="cms-stat" Elevation="0">
+            <span>Unread</span>
+            <strong>@unreadCount</strong>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" lg="3">
+        <MudPaper Class="cms-stat" Elevation="0">
+            <span>In progress</span>
+            <strong>@inProgressCount</strong>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="6" lg="3">
+        <MudPaper Class="cms-stat" Elevation="0">
+            <span>Total inquiries</span>
+            <strong>@totalCount</strong>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+<MudPaper Class="cms-dashboard-action" Elevation="0">
+    <div>
+        <p>Contact inbox</p>
+        <h2>Review the latest project inquiries.</h2>
+    </div>
+    <MudButton Href="/admin/contact-inquiries" Variant="Variant.Filled" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ArrowForward">
+        Open inbox
+    </MudButton>
+</MudPaper>
+</div>
+
+@code {
+    private int newCount;
+    private int unreadCount;
+    private int inProgressCount;
+    private int totalCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        totalCount = await db.ContactInquiries.CountAsync();
+        newCount = await db.ContactInquiries.CountAsync(x => x.Status == ContactInquiryStatus.New);
+        unreadCount = await db.ContactInquiries.CountAsync(x => !x.IsRead);
+        inProgressCount = await db.ContactInquiries.CountAsync(x => x.Status == ContactInquiryStatus.InProgress);
+    }
+}

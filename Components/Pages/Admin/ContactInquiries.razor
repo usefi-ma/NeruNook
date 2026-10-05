@@ -1,0 +1,131 @@
+@page "/admin/contact-inquiries"
+@layout AdminLayout
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<PageTitle>Contact Inquiries — NeruNook CMS</PageTitle>
+
+<div class="cms-inquiries-page">
+<header class="cms-page-header">
+    <div>
+        <p>Inbox</p>
+        <h1>Contact inquiries</h1>
+    </div>
+    <div class="cms-new-count"><strong>@NewCount</strong><span>New</span></div>
+</header>
+
+<div class="cms-filters">
+    <MudTextField T="string" @bind-Value="search" Placeholder="Search name, email or company" Variant="Variant.Outlined" Margin="Margin.Dense" Immediate="true" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" />
+    <MudSelect T="ContactInquiryStatus?" @bind-Value="statusFilter" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="true">
+        @foreach (var status in Enum.GetValues<ContactInquiryStatus>())
+        {
+            <MudSelectItem T="ContactInquiryStatus?" Value="@status">@StatusText(status)</MudSelectItem>
+        }
+    </MudSelect>
+</div>
+
+@if (loading)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" />
+}
+else if (!FilteredInquiries.Any())
+{
+    <MudPaper Class="cms-empty" Elevation="0">No inquiries match the current filters.</MudPaper>
+}
+else
+{
+    <div class="cms-table-wrap">
+        <MudTable T="ContactInquiry" Items="@FilteredInquiries" Hover="true" Elevation="0" RowsPerPage="10">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Company</MudTh>
+                <MudTh>Project type</MudTh>
+                <MudTh>Status</MudTh>
+                <MudTh>Created</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    <a class="cms-inquiry-link" href="@($"/admin/contact-inquiries/{context.Id}")">
+                        @context.Name
+                        @if (!context.IsRead)
+                        {
+                            <span class="cms-unread-dot" aria-label="Unread"></span>
+                        }
+                    </a>
+                </MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Company">@(string.IsNullOrWhiteSpace(context.Company) ? "—" : context.Company)</MudTd>
+                <MudTd DataLabel="Project type">@(string.IsNullOrWhiteSpace(context.ProjectType) ? "—" : ProjectTypeText(context.ProjectType))</MudTd>
+                <MudTd DataLabel="Status"><span class="@($"cms-status cms-status--{context.Status.ToString().ToLowerInvariant()}")">@StatusText(context.Status)</span></MudTd>
+                <MudTd DataLabel="Created">@context.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy")</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50 }" />
+            </PagerContent>
+        </MudTable>
+    </div>
+
+    <div class="cms-mobile-list">
+        @foreach (var inquiry in FilteredInquiries)
+        {
+            <a class="cms-mobile-inquiry" href="@($"/admin/contact-inquiries/{inquiry.Id}")">
+                <div>
+                    <strong>@inquiry.Name</strong>
+                    @if (!inquiry.IsRead)
+                    {
+                        <span class="cms-unread-dot" aria-label="Unread"></span>
+                    }
+                </div>
+                <span>@inquiry.Email</span>
+                <span>@inquiry.CreatedAtUtc.ToLocalTime().ToString("MMM d, yyyy · h:mm tt")</span>
+                <em class="@($"cms-status cms-status--{inquiry.Status.ToString().ToLowerInvariant()}")">@StatusText(inquiry.Status)</em>
+            </a>
+        }
+    </div>
+}
+</div>
+
+@code {
+    private List<ContactInquiry> inquiries = [];
+    private string search = "";
+    private ContactInquiryStatus? statusFilter;
+    private bool loading = true;
+
+    private int NewCount => inquiries.Count(x => x.Status == ContactInquiryStatus.New);
+
+    private IEnumerable<ContactInquiry> FilteredInquiries => inquiries.Where(x =>
+        (!statusFilter.HasValue || x.Status == statusFilter)
+        && (string.IsNullOrWhiteSpace(search)
+            || x.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || x.Email.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || x.Company.Contains(search, StringComparison.OrdinalIgnoreCase)
+            || x.ProjectType.Contains(search, StringComparison.OrdinalIgnoreCase)));
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var db = await DbFactory.CreateDbContextAsync();
+        inquiries = await db.ContactInquiries
+            .AsNoTracking()
+            .OrderByDescending(x => x.CreatedAtUtc)
+            .ToListAsync();
+        loading = false;
+    }
+
+    private static string StatusText(ContactInquiryStatus status) => status switch
+    {
+        ContactInquiryStatus.InProgress => "In progress",
+        _ => status.ToString()
+    };
+
+    private static string ProjectTypeText(string value) => value switch
+    {
+        "web-design" => "Web Design",
+        "e-commerce" => "E-Commerce",
+        "cms-digital-solution" => "CMS / Digital Solution",
+        "other" => "Other",
+        _ => value
+    };
+}

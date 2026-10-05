@@ -1,0 +1,23 @@
+.cms-detail-item {
+    display: grid;
+    gap: .45rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(23, 32, 25, .13);
+}
+
+.cms-detail-item:last-child {
+    border-bottom: 0;
+}
+
+.cms-detail-item span {
+    color: rgba(23, 32, 25, .5);
+    font-size: .67rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.cms-detail-item strong {
+    overflow-wrap: anywhere;
+    font-size: .94rem;
+    font-weight: 500;
+}
