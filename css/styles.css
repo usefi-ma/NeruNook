@@ -685,7 +685,7 @@ img {
 .full-page-panel {
   min-width: 0;
   border: 6px solid rgba(255,255,255,.82);
-  background-image: url("../assets/nexnovaco/full%20page.png");
+  background-image: url("../wwwroot/assets/nexnovaco/full%20page.png");
   background-repeat: no-repeat;
   background-size: 100% auto;
   box-shadow: 0 14px 32px rgba(20, 49, 71, .16);
