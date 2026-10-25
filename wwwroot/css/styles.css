@@ -685,10 +685,25 @@ img {
 .full-page-panel {
   min-width: 0;
   border: 6px solid rgba(255,255,255,.82);
-  background-image: url("../assets/nexnovaco/full%20page.png");
+  background-color: #f7f8f8;
   background-repeat: no-repeat;
-  background-size: 100% auto;
+  background-size: cover;
   box-shadow: 0 14px 32px rgba(20, 49, 71, .16);
+}
+
+.project-stage[data-project-experience="full-page"] .full-page-panel {
+  background-size: 100% auto;
+}
+
+.project-stage[data-project-experience="clinic-pages"] .project-art--experience {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.project-stage[data-project-experience="clinic-pages"] .full-page-panel {
+  margin-block: 0;
+  background-color: #fff;
+  background-size: 125% auto;
+  background-position: center top;
 }
 
 .full-page-panel--top {
@@ -744,6 +759,12 @@ img {
   border-radius: 17px;
   object-fit: cover;
   object-position: top;
+}
+
+.project-stage[data-project-experience="clinic-pages"][data-project-mode="responsive"] .phone-frame img {
+  object-fit: contain;
+  object-position: center top;
+  background: #1884c9;
 }
 
 .phone-speaker {
